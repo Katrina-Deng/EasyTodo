@@ -4,12 +4,13 @@
  * @Author: Ellen
  * @Date: 2021-06-09 21:40:16
  * @LastEditors: Ellen
- * @LastEditTime: 2021-06-09 22:37:06
+ * @LastEditTime: 2021-06-09 23:35:45
  */
 import path from "path";
 import configs from "./configs";
 import Koa from "koa";
 import koaRouter from "koa-router";
+import koaBody from "koa-body";
 import { bootstrapControllers } from "koa-ts-controllers";
 import { log } from "./utils/index";
 
@@ -21,9 +22,10 @@ const router: koaRouter = new koaRouter();
     router,
     basePath: "/api",
     versions: [1],
-    controllers: [path.resolve(__dirname + "controllers/**/*.ts")],
+    // windows '\\'
+    controllers: [path.resolve(__dirname + "\\controllers/**/*.ts")],
   });
-
+  app.use(koaBody());
   app.use(router.routes());
   app.listen(configs.server.port, () => {
     log("hello koa");
