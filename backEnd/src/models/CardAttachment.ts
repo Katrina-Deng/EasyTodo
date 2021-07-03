@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-30 21:47:25
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 21:05:40
+ * @LastEditTime: 2021-07-01 17:56:55
  */
 import {
   Model,
@@ -17,33 +17,31 @@ import {
   CreatedAt,
   UpdatedAt,
   DataType,
+  Default,
 } from "sequelize-typescript";
 
-import crypto from "crypto";
-
-// 确定表名
 @Table({
-  tableName: "User",
+  tableName: "CardAttachment",
 })
-export class User extends Model<User> {
+export class CardAttachment extends Model<CardAttachment> {
   @PrimaryKey
   @AutoIncrement
   @Column
   id: number;
 
-  @AllowNull(false)
-  @Unique
-  @Column({
-    type: DataType.STRING(50),
-  })
-  name: string;
+  // 外键
+  userId: number;
+  // 外键
+  boardListCardId: number;
+  // 外键
+  attachmentId: number;
 
-  @Column
-  set password(val: string) {
-    let md5 = crypto.createHash("md5");
-    let newPW = md5.update(val).digest("hex");
-    this.setDataValue("password", newPW);
-  }
+  @AllowNull(false)
+  @Default(0)
+  @Column({
+    type: DataType.BOOLEAN,
+  })
+  isCover: string;
 
   @CreatedAt
   createdAt: Date;

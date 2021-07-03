@@ -4,18 +4,18 @@
  * @Author: Ellen
  * @Date: 2021-06-09 19:35:35
  * @LastEditors: Ellen
- * @LastEditTime: 2021-06-30 21:30:16
+ * @LastEditTime: 2021-07-01 16:43:31
  */
-import databaseConfig from './database.json'
+import databaseConfig from "./database.json";
 
-interface IDataType{
-  host:string,
-  username:string,
-  password:string,
-  port:number,
-  timezone:string,
-  database:string,
-  dialect: 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql'
+interface IDataType {
+  host: string;
+  username: string;
+  password: string;
+  port: number;
+  timezone: string;
+  database: string;
+  dialect: "mysql" | "postgres" | "sqlite" | "mariadb" | "mssql";
 }
 
 const configs = {
@@ -24,22 +24,30 @@ const configs = {
       host: "localhost",
       port: 9527,
     },
-    dataBase:databaseConfig.development as IDataType
+    dataBase: databaseConfig.development as IDataType,
+    jwt: {
+      privateKey: "snake",
+    },
   },
   test: {
     server: {
       host: "localhost",
       port: 9527,
     },
-    dataBase:databaseConfig.test as IDataType
+    dataBase: databaseConfig.test as IDataType,
+    jwt: {
+      privateKey: "snake",
+    },
   },
   production: {
     server: {
       host: "localhost",
       port: 9527,
     },
-    dataBase:databaseConfig.production as IDataType
-
+    dataBase: databaseConfig.production as IDataType,
+    jwt: {
+      privateKey: "snake",
+    },
   },
 };
 

@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-30 23:52:55
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 00:09:30
+ * @LastEditTime: 2021-07-01 21:03:15
  */
 
 import {
@@ -32,12 +32,13 @@ export function IsSameValue(
       constraints: [property],
       options: vaildateOptions,
       validator: {
-        //   value: any, 装饰器传入的val
+        //   value: any, rePw value
         validate(
           value: any,
           validationArguments?: ValidationArguments | undefined
         ): boolean | Promise<boolean> {
           // 获取指定名称的属性值
+          // (validationArguments.object as any)[property]  用户输入的PW value
           let valueVaild =
             validationArguments &&
             (validationArguments.object as any)[property];

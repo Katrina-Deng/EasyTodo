@@ -4,10 +4,10 @@
  * @Author: Ellen
  * @Date: 2021-06-09 22:07:59
  * @LastEditors: Ellen
- * @LastEditTime: 2021-06-09 22:09:59
+ * @LastEditTime: 2021-07-01 16:00:41
  */
 
 import chalk from "chalk";
 export const log = (msg: string): void => {
-  console.log(chalk.magenta(msg));
+  console.log(chalk.greenBright(msg));
 };
