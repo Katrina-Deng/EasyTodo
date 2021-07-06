@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-30 21:47:25
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 17:50:49
+ * @LastEditTime: 2021-07-04 21:03:05
  */
 import {
   Model,
@@ -17,7 +17,9 @@ import {
   CreatedAt,
   UpdatedAt,
   DataType,
+  ForeignKey,
 } from "sequelize-typescript";
+import { User } from "./User";
 
 @Table({
   tableName: "Board",
@@ -29,10 +31,14 @@ export class Board extends Model<Board> {
   id: number;
 
   // 外键
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    allowNull: false,
+  })
   userId: number;
 
   @AllowNull(false)
-  @Unique
   @Column({
     type: DataType.STRING(255),
   })

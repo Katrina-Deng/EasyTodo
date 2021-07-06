@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-30 21:47:25
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 17:56:55
+ * @LastEditTime: 2021-07-04 18:57:15
  */
 import {
   Model,
@@ -14,12 +14,15 @@ import {
   AutoIncrement,
   AllowNull,
   Unique,
+  ForeignKey,
   CreatedAt,
   UpdatedAt,
   DataType,
   Default,
 } from "sequelize-typescript";
-
+import { User } from "./User";
+import { BoardListCard } from "./BoardListCard";
+import { Attachment } from "./Attachment";
 @Table({
   tableName: "CardAttachment",
 })
@@ -29,11 +32,25 @@ export class CardAttachment extends Model<CardAttachment> {
   @Column
   id: number;
 
-  // 外键
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    allowNull: false,
+  })
   userId: number;
-  // 外键
+
+  @ForeignKey(() => BoardListCard)
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    allowNull: false,
+  })
   boardListCardId: number;
-  // 外键
+
+  @ForeignKey(() => Attachment)
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    allowNull: false,
+  })
   attachmentId: number;
 
   @AllowNull(false)

@@ -4,10 +4,11 @@
  * @Author: Ellen
  * @Date: 2021-06-09 19:35:35
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 16:43:31
+ * @LastEditTime: 2021-07-04 11:32:11
  */
 import databaseConfig from "./database.json";
 
+//  dataBase Type
 interface IDataType {
   host: string;
   username: string;
@@ -15,6 +16,7 @@ interface IDataType {
   port: number;
   timezone: string;
   database: string;
+  // sequelize rules type
   dialect: "mysql" | "postgres" | "sqlite" | "mariadb" | "mssql";
 }
 

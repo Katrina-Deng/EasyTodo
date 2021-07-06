@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-01 21:44:27
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-02 19:38:14
+ * @LastEditTime: 2021-07-04 17:55:40
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
@@ -37,7 +37,7 @@ const routes = [
     },
     children: [
       {
-        path: 'list/:listid(\\d+)/card/:cardid(\\d+)',
+        path: 'list/:id(\\d+)/card/:id(\\d+)',
         name: 'Card',
         component: Card
       }

@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-01 16:58:08
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 17:31:44
+ * @LastEditTime: 2021-07-03 17:17:43
  */
 
 import koa from "koa";
@@ -14,6 +14,6 @@ import { UserInfo } from "./global.ext";
 // 扩展koa的声明
 declare module "koa" {
   interface Context {
-    userInfo?: UserInfo;
+    userInfo: UserInfo;
   }
 }

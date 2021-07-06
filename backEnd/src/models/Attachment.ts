@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-30 21:47:25
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 17:55:17
+ * @LastEditTime: 2021-07-04 18:53:54
  */
 import {
   Model,
@@ -18,7 +18,9 @@ import {
   UpdatedAt,
   DataType,
   Default,
+  ForeignKey,
 } from "sequelize-typescript";
+import { User } from "./User";
 
 @Table({
   tableName: "Attachment",
@@ -30,10 +32,14 @@ export class Attachment extends Model<Attachment> {
   id: number;
 
   // 外键
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    allowNull: false,
+  })
   userId: number;
 
   @AllowNull(false)
-  @Unique
   @Default("")
   @Column({
     type: DataType.STRING(255),
@@ -41,14 +47,12 @@ export class Attachment extends Model<Attachment> {
   originName: string;
 
   @AllowNull(false)
-  @Unique
   @Column({
     type: DataType.STRING(255),
   })
   name: string;
 
   @AllowNull(false)
-  @Unique
   @Column({
     type: DataType.STRING(50),
   })

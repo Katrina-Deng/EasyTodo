@@ -4,39 +4,19 @@
  * @Author: Ellen
  * @Date: 2021-07-01 22:26:55
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 23:08:10
+ * @LastEditTime: 2021-07-05 20:15:28
 -->
 <template>
   <div id="board">
     <!--头部-->
-    <header>
-      <div class="left">
-        <a href="" class="btn btn-icon">
-          <i class="icon icon-home"></i>
-        </a>
-        <a href="" class="btn btn-icon">
-          <i class="icon icon-board"></i>
-          <span class="txt">看板</span>
-        </a>
-      </div>
-      <a href="/" class="logo"></a>
-      <div class="right">
-        <a href="" class="btn btn-icon">
-          <i class="icon icon-add"></i>
-        </a>
-        <button class="avatar">
-          <span>Z</span>
-        </button>
-      </div>
-    </header>
-
+    <t-header></t-header>
     <!--正文-->
     <main>
-      <h2>
-        test
-        <span class="btn btn-icon">
+      <h2 v-if="boardName">
+        <span>{{ boardName.name }}</span>
+        <!-- <span class="btn btn-icon">
           邀请
-        </span>
+        </span> -->
       </h2>
 
       <!--面板容器-->
@@ -293,41 +273,44 @@
       </div>
     </main>
 
-    <!--弹窗，可用于对话框、弹出式菜单等-->
-    <!--弹出式菜单-->
-    <div class="popup" style="left: 930px;top: 98px;display: block">
-      <div class="popup-header">
-        <span class="popup-title">Title</span>
-        <a class="popup-header-close">
-          <i class="icon icon-close"></i>
-        </a>
-      </div>
-
-      <div class="popup-content">
-        <ul class="popup-menu-list">
-          <li><span>添加卡…</span></li>
-          <li><span>复制列表…</span></li>
-          <li><span>移动列表</span></li>
-          <li><span>关注 </span></li>
-        </ul>
-        <hr />
-        <ul class="popup-menu-list">
-          <li><span>移动此列表中的所有卡片…</span></li>
-          <li><span>归档这个列表中的所有卡…</span></li>
-        </ul>
-        <hr />
-        <ul class="popup-menu-list">
-          <li><span>将此列表进行归档</span></li>
-        </ul>
-      </div>
-    </div>
-
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-export default {}
+import THeader from '../components/THeader.vue'
+
+export default {
+  name: 'Board',
+  components: { THeader },
+  data() {
+    return {
+      boardName: null
+    }
+  },
+  // 有点坑，getters获取不到信息，可能是异步的原因
+  // computed: {
+  //   boardName() {
+  //     return this.$store.getters['board/getBoardName'](this.$route.params.id)
+  //   }
+  // },
+  activated() {
+    this.getboardName()
+  },
+  methods: {
+    getboardName() {
+      if (!this.boardName) {
+        this.$api.board.getBoard(this.$route.params.id).then(res => {
+          this.boardName = res.data
+        })
+      } else {
+        this.boardName = this.$store.getters['board/getBoardName'](
+          this.$route.params.id
+        )
+      }
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped></style>

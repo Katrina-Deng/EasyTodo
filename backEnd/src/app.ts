@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-09 21:40:16
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-02 18:13:49
+ * @LastEditTime: 2021-07-04 15:23:14
  */
 import path from "path";
 import configs from "./configs";
@@ -27,7 +27,7 @@ const router: koaRouter = new koaRouter();
     models: [__dirname + "\\models/**/*"],
   });
 
-  // jwt  解密
+  // jwt  解密 挂载 userInfo in Ctx
   app.use(JwtVerify());
 
   // Controllers
@@ -40,7 +40,6 @@ const router: koaRouter = new koaRouter();
     // 统一error处理
     errorHandler: async (error: any, ctx: Context) => {
       console.log("error", error);
-
       let statusCode: number = 500;
       let body: any = {
         statusCode: statusCode,

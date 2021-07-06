@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-30 21:47:25
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 17:52:47
+ * @LastEditTime: 2021-07-04 18:56:29
  */
 import {
   Model,
@@ -17,8 +17,14 @@ import {
   CreatedAt,
   UpdatedAt,
   DataType,
+  ForeignKey,
+  HasMany,
 } from "sequelize-typescript";
 
+import { BoardList } from "./BoardList";
+import { User } from "./User";
+import { CardAttachment } from "./CardAttachment";
+import { Comment } from "./Comment";
 @Table({
   tableName: "BoardListCard",
 })
@@ -28,10 +34,18 @@ export class BoardListCard extends Model<BoardListCard> {
   @Column
   id: number;
 
-  // 外键
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    allowNull: false,
+  })
   userId: number;
 
-  // 外键
+  @ForeignKey(() => BoardList)
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    allowNull: false,
+  })
   boardListId: number;
 
   @AllowNull(false)
@@ -52,7 +66,13 @@ export class BoardListCard extends Model<BoardListCard> {
   @Column({
     type: DataType.FLOAT,
   })
-  order: string;
+  order: number;
+
+  @HasMany(() => CardAttachment)
+  attachments: CardAttachment[];
+
+  @HasMany(() => Comment)
+  comments: Comment[];
 
   @CreatedAt
   createdAt: Date;

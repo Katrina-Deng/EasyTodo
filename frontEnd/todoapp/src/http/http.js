@@ -4,10 +4,14 @@
  * @Author: Ellen
  * @Date: 2021-07-02 12:10:42
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-02 18:17:36
+ * @LastEditTime: 2021-07-04 16:13:26
  */
 import axios from 'axios'
 import { Message } from 'element-ui' // 引入elm组件
+import {
+  showFullScreenLoading,
+  tryHideFullScreenLoading
+} from '@/utils/loading'
 
 export default function $axios(options) {
   return new Promise((resolve, reject) => {
@@ -33,6 +37,12 @@ export default function $axios(options) {
     // request
     server.interceptors.request.use(
       config => {
+        showFullScreenLoading()
+        // console.log('config', config)
+        const userData = JSON.parse(localStorage.getItem('user'))
+        if (userData && userData.authorization) {
+          config.headers.common.authorization = userData.authorization
+        }
         return config
       },
       error => {
@@ -42,11 +52,13 @@ export default function $axios(options) {
     // response
     server.interceptors.response.use(
       response => {
+        tryHideFullScreenLoading()
         return response
       },
       error => {
+        tryHideFullScreenLoading()
         // Message({ message: '注册失败', type: 'error' })
-        console.dir(error.response)
+        console.log(error.response)
         let { message, errDetails } = error.response.data
         if (errDetails) {
           message = message + ':' + errDetails
