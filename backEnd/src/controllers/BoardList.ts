@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-04 17:50:11
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-06 23:12:58
+ * @LastEditTime: 2021-07-07 21:29:16
  */
 import {
   Controller,
@@ -117,7 +117,7 @@ export default class BoardListsController {
     boardList.order = order || boardList.order;
     await boardList.save();
     ctx.status = 204;
-    return;
+    return boardList;
   }
 
   /**

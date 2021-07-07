@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-06 16:45:12
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-06 21:36:04
+ * @LastEditTime: 2021-07-07 21:09:46
  */
 import $axios from '../../http'
 
@@ -31,6 +31,18 @@ export const postList = data => {
     data: {
       boardId: data.boardId,
       name: data.name
+    }
+  })
+}
+
+export const putList = data => {
+  return $axios({
+    url: '/list/' + data.boardListId,
+    method: 'put',
+    data: {
+      boardId: data.boardId,
+      name: data.name,
+      order: data.order
     }
   })
 }

@@ -4,23 +4,32 @@
  * @Author: Ellen
  * @Date: 2021-07-06 18:39:22
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-06 23:40:29
+ * @LastEditTime: 2021-07-07 22:12:36
 -->
 <template>
   <!-- 不动的 -->
-  <div class="list-wrap " :class="{ 'list-adding': isAddList }">
-    <div class="list-placeholder"></div>
+  <div
+    class="list-wrap list-wrap-content"
+    :class="{ 'list-adding': isAddList }"
+    :data-order="data.order"
+  >
+    <!-- 列表占位 -->
+    <div class="list-placeholder" ref="listholder"></div>
 
     <!-- list 移动容器， list-header 触发移动的-->
     <div class="list" ref="list">
-      <div class="list-header" ref="listHeader" @click="dragDown">
+      <!-- 报错原因：这里点击执行了 -->
+      <!-- v-model="data.name" -->
+      <div class="list-header" ref="listHeader">
         <textarea
           class="form-field-input"
-          v-model="data.name"
           @mousedown.prevent
-          @mousemove.prevent
-        ></textarea>
-        <div class="extras-menu" @mousedown.prevent @mousemove.prevent>
+          ref="ListName"
+          v-model="data.name"
+          @blur="editListName(data.name)"
+        >
+        </textarea>
+        <div class="extras-menu" @mousedown.prevent>
           <span class="icon icon-more"></span>
         </div>
       </div>
@@ -83,12 +92,11 @@ export default {
       isAddList: false,
       drag: {
         isDown: false,
+        isDrag: false,
         mousex: 0,
         mousey: 0,
         ElementX: 0,
-        ElementY: 0,
-        offsetX: 0,
-        offsetY: 0
+        ElementY: 0
       }
     }
   },
@@ -104,21 +112,74 @@ export default {
       this.drag.mousex = e.clientX
       this.drag.mousey = e.clientY
       const position = this.$refs.list.getBoundingClientRect()
-      this.drag.ElementX = position.left
-      this.drag.ElementY = position.top
+      this.drag.ElementX = position.x
+      this.drag.ElementY = position.y
     },
     dragMove(e) {
       // 判断鼠标是否按下了
       if (this.drag.isDown) {
-        this.drag.offsetX = Math.abs(e.clientX - this.drag.mousex)
-        this.drag.offsetY = Math.abs(e.clientY - this.drag.mousey)
-        if (this.drag.offsetX > 10 || this.drag.offsetY) {
-          console.log('draging')
+        // eslint-disable-next-line no-unused-vars
+        const ListElment = this.$refs.list
+        // eslint-disable-next-line prefer-const
+        let X = e.clientX - this.drag.mousex
+        // eslint-disable-next-line prefer-const
+        let Y = e.clientY - this.drag.mousey
+        this.$refs.listholder.style.height = this.$refs.list.offsetHeight + 'px'
+        if (X > 10 || Y > 10) {
+          // 超过移动距离判断，设置拖动标志
+          if (!this.drag.isDrag) {
+            this.drag.isDrag = true // 拖动过程中只触发一次
+            ListElment.style.position = 'absolute'
+            ListElment.style.zIndex = 9999
+            ListElment.style.transform = 'rotate(5deg)'
+            document.body.appendChild(ListElment)
+            this.$emit('dragStart', { component: this })
+          }
+          // 跟随鼠标移动
+          ListElment.style.left = this.drag.ElementX + X + 'px'
+          ListElment.style.top = this.drag.ElementY + Y + 'px'
+          this.$emit('dragMove', {
+            component: this,
+            x: e.clientX,
+            y: e.clientY
+          })
         }
       }
     },
     dragUp(e) {
-      this.drag.isDown = false
+      if (this.drag.isDown) {
+        if (this.drag.isDrag) {
+          // 测试还原位置
+          this.$refs.list.style.position = 'relative'
+          this.$refs.list.style.zIndex = 0
+          this.$refs.list.style.transform = 'rotate(0deg)'
+          this.$refs.list.style.left = 0 + 'px'
+          this.$refs.list.style.top = 0 + 'px'
+          this.$el.appendChild(this.$refs.list)
+          this.$refs.listholder.style.height = 0 + 'px'
+          this.$emit('dragEnd', {
+            component: this
+          })
+        } else {
+          if (e.path.includes(this.$refs.ListName)) {
+            this.$refs.ListName.select()
+            this.$refs.ListName.innerHTML = this.data.name
+          }
+        }
+        this.drag.isDown = false
+        this.drag.isDrag = false
+      }
+    },
+    editListName() {
+      const nVal = this.$refs.ListName.value
+      const oVal = this.$refs.ListName.innerHTML
+      if (nVal !== oVal) {
+        this.$store.dispatch('list/putList', {
+          boardId: this.data.boardId,
+          boardListId: this.data.id,
+          name: nVal
+        })
+      }
     },
     showAddList() {
       this.isAddList = true

@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-01 22:26:55
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-06 21:48:12
+ * @LastEditTime: 2021-07-07 21:27:29
 -->
 <template>
   <div id="board">
@@ -22,7 +22,14 @@
       <!--面板容器-->
       <div class="board">
         <!--面板列表容器-->
-        <t-list v-for="list in lists" :key="list.id" :data="list"></t-list>
+        <t-list
+          v-for="list in lists"
+          @dragStart="dragStart"
+          @dragMove="dragMove"
+          @dragEnd="dragEnd"
+          :key="list.id"
+          :data="list"
+        ></t-list>
         <!--无内容列表容器-->
         <!-- 添加按钮 -->
         <div class="list-wrap no-content" :class="{ 'list-adding': isAddList }">
@@ -88,6 +95,77 @@ export default {
     this.getLists()
   },
   methods: {
+    // 拖拽
+    dragStart(e) {
+      // 记录原始的位置
+      const currentComp = e.component.$el
+      const BoardList = currentComp.parentNode
+      const lists = [...BoardList.querySelectorAll('.list-wrap-content')]
+      // eslint-disable-next-line no-unused-vars
+      currentComp.listStartIndex = lists.findIndex(e => e === currentComp)
+    },
+    dragMove(e) {
+      // 获取list 节点
+      const currentComp = e.component.$el
+      // 获得 .board 里面node
+      const BoardList = currentComp.parentNode
+      const lists = [...BoardList.querySelectorAll('.list-wrap-content')]
+      const currentIndex = lists.findIndex(item => item === currentComp)
+      lists.forEach((list, index) => {
+        // 不是当前该元素
+        if (index !== currentIndex) {
+          // 获取碰撞体的位置
+          const positon = list.getBoundingClientRect()
+          if (
+            e.x >= positon.left &&
+            e.x <= positon.right &&
+            e.y >= positon.top &&
+            e.y <= positon.bottom
+          ) {
+            // 从前往后插
+            if (currentIndex < index) {
+              BoardList.insertBefore(currentComp, list.nextElementSibling)
+            } else {
+              BoardList.insertBefore(currentComp, list)
+            }
+          }
+        }
+      })
+    },
+    dragEnd(e) {
+      const currentComp = e.component.$el
+      const BoardList = currentComp.parentNode
+      const lists = [...BoardList.querySelectorAll('.list-wrap-content')]
+      const listEndIndex = lists.findIndex(e => e === currentComp)
+      if (currentComp.listStartIndex !== listEndIndex) {
+        // console.log('交换了位置')
+        // eslint-disable-next-line no-unused-vars
+        let newOrder = 0
+        const preOrder =
+          lists[listEndIndex - 1] &&
+          parseFloat(lists[listEndIndex - 1].dataset.order)
+        const nextOrder =
+          lists[listEndIndex + 1] &&
+          parseFloat(lists[listEndIndex + 1].dataset.order)
+        if (!preOrder) {
+          newOrder = nextOrder / 2
+          // console.log('neworder0', newOrder)
+        } else if (!nextOrder) {
+          newOrder = preOrder + 65535
+          // console.log('neworder末', newOrder)
+        } else {
+          newOrder = preOrder + (nextOrder - preOrder) / 2
+          // console.log('neworder中', newOrder)
+        }
+        // 发起请求了
+        this.$store.dispatch('list/putList', {
+          boardId: this.boardName.id,
+          boardListId: e.component.data.id,
+          order: newOrder
+        })
+      }
+    },
+
     getboardName() {
       if (!this.boardName) {
         this.$store.dispatch('board/getBorad', this.$route.params.id)

@@ -123,7 +123,7 @@ mapGetters方法 不能传参好像不能用这个
   - 控制列表样式显示添加列表
   - 显示便标题
 
-- 无内容列表容易
+- 无内容列表
 
   通过类标签来控制样式
 
@@ -156,15 +156,65 @@ mapGetters方法 不能传参好像不能用这个
   - 拖拽方法
 
     - 用到mousedown,mousemove,mouseup 和对应的方法
+    
     - 位置：
       - 鼠标按下的位置 xy
       - 移动过程中元素的初始的距离页面的位置(getBoundingClientRect): xy  
+      
     - mousedown
       - 获取 鼠标按下的位置 xy  移动过程中元素的初始的位置: xy  
       - 移动标志 true false
-
+    
     - mousemove
-      - 移动标志 true false判断
+      - 移动标志 true false判断，拖动标志 true false判断
+      
       - 计算插值：鼠标当前的位置 - 移动过程中元素的初始的位置: xy 
-      - 判断x y 的距离大于10 px,即输出移动，否则就是默认行为。
+      
+      - 判断x y 的距离大于10 px,即输出移动，否则就是默认行为。--（拖动标志 true false判断）
+      
+      - 元素跟随
+      
+        鼠标位置按照页面算的，不是按照元素算。所以可以把list元素设置绝对定位，绝对定位也是按页面算。可以做到一致性，zindex transform bodychild 发送emit事件参数 this，。move过程中设置元素位置，发送emit事件参数 this，移动位置
+      
+    - mouseup
+    
+      - 判断按下标志==>判断拖拽标记。就是按下之后是否有拖拽，写拖拽的逻辑和非拖拽的逻辑
+    
+      - 写拖拽的逻辑
+    
+      - 非拖拽的逻辑。让用户可以修改标题 .select()
+    
+        [select()-MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLInputElement/select)
+    
+      - 判断处理完就把标记取反
+    
+      - 元素定位
+    
+        - 测试：先把元素还原。pos transform zindex ,list-wrap容器 left top 。发送emit事件参数 this，
+    
+    - 拖拽的元素占位
+    
+      - 将阴影的占位高度设置为元素的高度，再鼠标抬起还原
+    
+  - 拖拽重新定位
+  
+    - 父级接收事件
+  
+    - 思路：鼠标进入到其他列表里面，就是发起order排序。获取list时候不要用ref，这时候的ref是componets组件而且是一个不变的数据。所以用原生querySelectorAll获取list集合
+  
+    - 获取当前list的再集合的位置,for循环。检测鼠标是不是再其他list里面
+  
+      判断是往前交换还是往后交换，然后插入到这个元素的前面，（使用**nextElementSibling**属性返回指定元素之后的下一个兄弟元素，（即：相同节点树层中的下一个元素节点）。insertBefore() 方法在您指定的已有子节点之前插入新的子节点。）
+  
+      **小于：插再碰撞体下一个兄弟节点的前面**
+  
+      **大于：往前移动，就是直接是这个元素的前面**
+  
+  - 拖拽重新排序
+  
+    - 要在鼠标抬起之后做。也是拿原生
+  
+    
+  
+    
 
