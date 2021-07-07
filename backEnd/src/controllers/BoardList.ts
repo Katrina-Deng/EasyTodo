@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-04 17:50:11
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-04 21:49:23
+ * @LastEditTime: 2021-07-06 23:12:58
  */
 import {
   Controller,
@@ -40,10 +40,17 @@ export default class BoardListsController {
     let { boardId, name } = body;
     await getAndVaildBoardID(boardId, ctx.userInfo.id);
     let newBoardList = new BoardListModel();
+    // 取最大值
+    let maxOrderBoard = await BoardListModel.findOne({
+      where: { boardId },
+      order: [["order", "desc"]],
+    });
+    console.log("maxOrderBoard", maxOrderBoard);
+
     newBoardList.boardId = boardId;
     newBoardList.userId = ctx.userInfo.id;
     newBoardList.name = name;
-    newBoardList.order = 65535;
+    newBoardList.order = maxOrderBoard ? maxOrderBoard.order + 65535 : 65535;
     await newBoardList.save();
     ctx.status = 201;
     return newBoardList;

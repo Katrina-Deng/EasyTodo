@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-04 12:03:54
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-05 19:46:32
+ * @LastEditTime: 2021-07-06 17:56:40
  */
 import { board } from '@/http/api/index.js'
 export default {
@@ -17,7 +17,9 @@ export default {
   getters: {
     // 获取id
     getBoardName: ({ boardList }) => id =>
-      Array.isArray(boardList) ? boardList.find(board => board.id === id) : null
+      Array.isArray(boardList)
+        ? boardList.find(board => board.id === parseInt(id))
+        : null
   },
   mutations: {
     updateBoard: (state, data) => {

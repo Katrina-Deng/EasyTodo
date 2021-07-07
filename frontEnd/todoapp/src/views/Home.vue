@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-01 22:26:47
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-05 19:39:26
+ * @LastEditTime: 2021-07-06 17:10:05
 -->
 <template>
   <div id="home">
@@ -68,11 +68,11 @@ export default {
       inited: state => state.inited
     })
   },
-  created() {
-    if (!this.inited) {
-      this.$store.dispatch('board/getBorads')
-    }
-  },
+  // created() {
+  //   if (!this.inited) {
+  //     this.$store.dispatch('board/getBorads')
+  //   }
+  // },
   activated() {
     if (!this.inited) {
       this.$store.dispatch('board/getBorads')

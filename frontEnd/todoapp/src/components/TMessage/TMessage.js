@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-02 15:03:30
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-02 16:09:03
+ * @LastEditTime: 2021-07-06 18:27:43
  */
 import TMessage from './TMessage.vue'
 import vue from 'vue'
@@ -14,7 +14,7 @@ const TMessageClass = vue.extend(TMessage)
 let instances = []
 
 // 工厂函数 通过调用 得到新组件实例TMessage
-// 管理组件队列
+// 消息管理
 function Message(data) {
   data = data || {}
   if (typeof options === 'string') {
@@ -22,7 +22,7 @@ function Message(data) {
       message: data
     }
   }
-
+  // 管理组件队列
   //   传入data method mount等组件实例相关的属性
   const instance = new TMessageClass({ data })
   data.onClose = function() {

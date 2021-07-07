@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-03 16:44:01
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-04 19:13:11
+ * @LastEditTime: 2021-07-06 21:26:47
  */
 
 import { IsNotEmpty, MaxLength, ValidateIf } from "class-validator";

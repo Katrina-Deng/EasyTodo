@@ -78,6 +78,7 @@ u:hover {
 }
 .icon.icon-add:before {
   content: '\E901';
+  color: blue;
 }
 .icon.icon-more:before {
   content: '\E94B';
@@ -531,15 +532,15 @@ board
 }
 
 .board {
-  display: flex;
-  /*overflow-x: auto;*/
-  /*overflow-y: hidden;*/
+  overflow-x: auto;
+  overflow-y: hidden;
   padding-bottom: 8px;
   position: absolute;
   top: 60px;
   right: 0;
   bottom: 0;
   left: 0;
+  white-space: nowrap;
 }
 .list-wrap {
   position: relative;
@@ -547,7 +548,7 @@ board
   margin: 0 4px;
   box-sizing: border-box;
   vertical-align: top;
-  width: 300px;
+  width: 250px;
   border-radius: 3px;
 }
 .list {
@@ -668,6 +669,7 @@ board
   color: #5e6c84;
   text-decoration: none;
   line-height: 32px;
+  cursor: pointer;
 }
 .list-card-add:hover {
   background-color: rgba(9, 30, 66, 0.08);
@@ -696,15 +698,15 @@ board
 /*无内容列表*/
 .list-add {
   padding: 4px 10px;
-  background-color: hsla(0, 0%, 100%, 0.24);
+  background-color: hsla(0, 0%, 100%, 0.8);
   border-radius: 3px;
   line-height: 32px;
-  color: white;
+  color: #026aa7;
   cursor: pointer;
   transition: all 0.5s;
 }
 .list-add:hover {
-  background-color: hsla(0, 0%, 100%, 0.32);
+  background-color: hsla(0, 0%, 100%, 0.5);
 }
 .no-content .list-card-add-form {
   margin: 8px 0;
