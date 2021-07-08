@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-06 16:50:35
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-07 22:13:34
+ * @LastEditTime: 2021-07-08 21:21:13
  */
 import { list } from '@/http/api/index.js'
 
@@ -14,9 +14,12 @@ export default {
     list: []
   },
   getters: {
-    //   过滤
+    //   过滤多个
     getLists: state => boardId =>
-      state.list.filter(item => item.boardId === parseInt(boardId))
+      state.list.filter(item => item.boardId === parseInt(boardId)),
+
+    getList: state => listid =>
+      state.list.find(item => item.id === parseInt(listid))
   },
 
   mutations: {
@@ -45,7 +48,6 @@ export default {
     async putList({ commit }, data) {
       // eslint-disable-next-line no-unused-vars
       const res = await list.putList(data)
-
       commit('updateList', data)
     }
   }

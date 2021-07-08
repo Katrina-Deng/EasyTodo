@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-09 21:40:16
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-04 15:23:14
+ * @LastEditTime: 2021-07-08 22:54:22
  */
 import path from "path";
 import configs from "./configs";
@@ -16,11 +16,20 @@ import { log } from "./utils/index";
 import Boom from "@hapi/boom";
 import { Sequelize } from "sequelize-typescript";
 import JwtVerify from "./middlewares/JWTverify";
-
-const app: Koa = new Koa();
-const router: koaRouter = new koaRouter();
+import koaStaticCache from "koa-static-cache";
 
 ~(async function () {
+  const app: Koa = new Koa();
+  const router: koaRouter = new koaRouter();
+  app.use(
+    koaStaticCache({
+      dir: configs.storage.dir,
+      prefix: configs.storage.path,
+      gzip: true,
+      dynamic: true,
+    })
+  );
+
   // connect db
   const db = new Sequelize({
     ...configs.dataBase,
@@ -61,6 +70,7 @@ const router: koaRouter = new koaRouter();
   router.all("/(.*)", async (ctx) => {
     throw Boom.notFound("router not found");
   });
+
   app.use(koaBody());
   app.use(router.routes());
   app.listen(configs.server.port, () => {

@@ -4,15 +4,12 @@
  * @Author: Ellen
  * @Date: 2021-07-06 18:39:22
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-07 22:12:36
+ * @LastEditTime: 2021-07-08 17:54:19
 -->
 <template>
   <!-- 不动的 -->
-  <div
-    class="list-wrap list-wrap-content"
-    :class="{ 'list-adding': isAddList }"
-    :data-order="data.order"
-  >
+  <!-- :class="{ 'list-adding': isCardAdd }" -->
+  <div class="list-wrap list-wrap-content" :data-order="data.order">
     <!-- 列表占位 -->
     <div class="list-placeholder" ref="listholder"></div>
 
@@ -34,53 +31,56 @@
         </div>
       </div>
 
+      <!-- card start -->
       <div class="list-cards">
-        <div class="list-card">
-          <div
-            class="list-card-cover"
-            style="background-image: url(https://trello-attachments.s3.amazonaws.com/5ddf961b5e861107e5f2de49/200x200/96d8fa19e335be20c102d394ef4bed71/logo.png);"
-          ></div>
-          <div class="list-card-title">接口代码编写及测试</div>
-          <div class="list-card-badges">
-            <div class="badge">
-              <span class="icon icon-description"></span>
-            </div>
-            <div class="badge">
-              <span class="icon icon-comment"></span>
-              <span class="text">2</span>
-            </div>
-            <div class="badge">
-              <span class="icon icon-attachment"></span>
-              <span class="text">5</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="list-card-add-form">
-          <textarea
-            class="form-field-input"
-            placeholder="为这张卡片添加标题……"
-            ref="CardName"
-          ></textarea>
-        </div>
+        <t-card v-for="card in cards" :data="card" :key="card.id"></t-card>
       </div>
-
+      <!-- end card -->
       <div class="list-footer">
-        <div class="list-card-add" @click="showAddList">
+        <div class="list-card-add" @click="showAddCard">
           <span class="icon icon-add"></span>
           <span>添加另一张卡片</span>
         </div>
-        <div class="list-add-confirm">
-          <button class="btn btn-success">添加卡片</button>
-          <span class="icon icon-close" @click="hideAddList"></span>
-        </div>
       </div>
     </div>
+
+    <!-- 新增卡片 -->
+    <el-dialog
+      title="新增卡片"
+      :visible.sync="isCardAdd"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        :model="form"
+        :rules="rule"
+        ref="form"
+        :hide-required-asterisk="true"
+        label-width="80px"
+      >
+        <el-form-item label="卡片名称： " prop="name">
+          <el-col :span="18">
+            <el-input v-model="form.name"></el-input>
+          </el-col>
+        </el-form-item>
+
+        <el-form-item label="卡片描述： " prop="description">
+          <el-col :span="18">
+            <el-input v-model="form.description"></el-input>
+          </el-col>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="hideAddCard">取 消</el-button>
+        <el-button type="primary" @click="postCard">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import TCard from './TCard.vue'
 export default {
+  components: { TCard },
   name: 'TList',
   props: {
     data: {
@@ -89,7 +89,7 @@ export default {
   },
   data() {
     return {
-      isAddList: false,
+      isCardAdd: false,
       drag: {
         isDown: false,
         isDrag: false,
@@ -97,16 +97,35 @@ export default {
         mousey: 0,
         ElementX: 0,
         ElementY: 0
+      },
+      form: {
+        name: '',
+        description: ''
+      },
+      rule: {
+        name: [{ required: true, message: '卡片名称不能为空', trigger: 'blur' }]
       }
     }
   },
+  created() {
+    this.getCards()
+  },
+  computed: {
+    cards() {
+      return this.$store.getters['card/allCards'](this.data.id)
+    }
+  },
   mounted() {
-    // console.log(this.drag.isDown)
     this.$refs.listHeader.addEventListener('mousedown', this.dragDown)
     document.addEventListener('mousemove', this.dragMove)
     document.addEventListener('mouseup', this.dragUp)
   },
   methods: {
+    getCards() {
+      if (!this.cards.length) {
+        this.$store.dispatch('card/getCards', this.data.id)
+      }
+    },
     dragDown(e) {
       this.drag.isDown = true
       this.drag.mousex = e.clientX
@@ -181,14 +200,31 @@ export default {
         })
       }
     },
-    showAddList() {
-      this.isAddList = true
-      this.$nextTick(() => {
-        this.$refs.CardName.focus()
-      })
+    showAddCard() {
+      this.isCardAdd = true
     },
-    hideAddList() {
-      this.isAddList = false
+    hideAddCard() {
+      this.isCardAdd = false
+      this.$refs.form.resetFields()
+      this.$refs.form.clearValidate()
+    },
+    postCard() {
+      this.$refs.form.validate(res => {
+        if (res) {
+          this.$store
+            .dispatch('card/postCard', {
+              boardListId: this.data.id,
+              name: this.form.name,
+              description: this.form.description
+            })
+            .then(res => {
+              if (res.status === 201) {
+                this.$message.success('添加成功')
+                this.hideAddCard()
+              }
+            })
+        }
+      })
     }
   }
 }

@@ -4,11 +4,12 @@
  * @Author: Ellen
  * @Date: 2021-07-01 21:44:27
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-04 17:55:40
+ * @LastEditTime: 2021-07-08 23:28:24
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import store from '@/store'
+import nprogress from 'nprogress'
+import 'nprogress/nprogress.css'
 Vue.use(VueRouter)
 
 const Home = () => import(/* webpackChunkName: "Home" */ '../views/Home.vue')
@@ -37,7 +38,7 @@ const routes = [
     },
     children: [
       {
-        path: 'list/:id(\\d+)/card/:id(\\d+)',
+        path: 'list/:listid(\\d+)/card/:cardid(\\d+)',
         name: 'Card',
         component: Card
       }
@@ -64,15 +65,21 @@ const router = new VueRouter({
   base: process.env.VUE_DEV_BASE_URL,
   routes
 })
-
+nprogress.configure({ ease: 'linear', speed: 500 })
 router.beforeEach(function(to, from, next) {
   if (
     to.matched.some(record => record.meta.auth) &&
     !localStorage.getItem('user')
   ) {
+    nprogress.start()
     next({ name: 'Login' })
   } else {
+    nprogress.start()
     next()
   }
 })
+router.afterEach(() => {
+  nprogress.done() // 完成进度条
+})
+
 export default router

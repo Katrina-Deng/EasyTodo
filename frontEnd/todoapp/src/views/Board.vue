@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-01 22:26:55
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-07 21:27:29
+ * @LastEditTime: 2021-07-08 21:58:40
 -->
 <template>
   <div id="board">
@@ -91,7 +91,6 @@ export default {
   },
   activated() {
     this.getboardName()
-    // this.getList()
     this.getLists()
   },
   methods: {
@@ -149,13 +148,10 @@ export default {
           parseFloat(lists[listEndIndex + 1].dataset.order)
         if (!preOrder) {
           newOrder = nextOrder / 2
-          // console.log('neworder0', newOrder)
         } else if (!nextOrder) {
           newOrder = preOrder + 65535
-          // console.log('neworder末', newOrder)
         } else {
           newOrder = preOrder + (nextOrder - preOrder) / 2
-          // console.log('neworder中', newOrder)
         }
         // 发起请求了
         this.$store.dispatch('list/putList', {

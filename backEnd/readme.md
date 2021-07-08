@@ -4,8 +4,12 @@
  * @Author: Ellen
  * @Date: 2021-06-30 16:04:12
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-01 21:28:29
+ * @LastEditTime: 2021-07-07 22:31:13
 -->
+
+# git
+
+https://www.cnblogs.com/ivy-zheng/p/13098818.html
 
 # koa-ts-controller
 
@@ -43,3 +47,9 @@ sequelize seed:generate Generates a new seed file [aliases: seed:create]
 Options:
 --version Show version number [boolean]
 --help Show help
+
+
+
+## 后端思路
+
+卡片路由

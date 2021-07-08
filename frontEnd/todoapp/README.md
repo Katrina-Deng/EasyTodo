@@ -47,7 +47,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 https://www.e-learn.cn/topic/3156016
 
-## 思路笔记 
+## 面板 
 
 ### 面板详情页
 
@@ -197,24 +197,113 @@ mapGetters方法 不能传参好像不能用这个
       - 将阴影的占位高度设置为元素的高度，再鼠标抬起还原
     
   - 拖拽重新定位
-  
+
     - 父级接收事件
-  
+
     - 思路：鼠标进入到其他列表里面，就是发起order排序。获取list时候不要用ref，这时候的ref是componets组件而且是一个不变的数据。所以用原生querySelectorAll获取list集合
-  
+
     - 获取当前list的再集合的位置,for循环。检测鼠标是不是再其他list里面
-  
+
       判断是往前交换还是往后交换，然后插入到这个元素的前面，（使用**nextElementSibling**属性返回指定元素之后的下一个兄弟元素，（即：相同节点树层中的下一个元素节点）。insertBefore() 方法在您指定的已有子节点之前插入新的子节点。）
-  
+
       **小于：插再碰撞体下一个兄弟节点的前面**
-  
+
       **大于：往前移动，就是直接是这个元素的前面**
-  
+
   - 拖拽重新排序
-  
+
     - 要在鼠标抬起之后做。也是拿原生
+
+    - 有没有变动？ start 时候原本的index 和end时候的indexx有没有变动
+
+    - 拿到碰撞体和前面/后面碰撞体的order值。（看怎么插入了）
+
+    - 排位的情况
+
+      添加data-order值的这个属性，方便处理情况时候获取。获取上一个元素和下一个元素的值
+
+      - 0位  直接前一个元素除以2 
+      - 末位 直接前一个元素+ 65535  
+      - 中间 前一个元素order + (前一个元素order+ 后一个元素的order的平均值)
+
+    - 发起请求了
+
+      更新order值，put
+
+- 列表名字修改
+
+  - val 新值 和 innerHTML旧制（没有响应式） 
+
   
-    
+
+## 卡片
+
+https://www.dazhuanlan.com/2019/09/24/5d89cc2874f5f/
+
+联表查询
+
+在查询评论数和附件过程中，需要用到联表查询
+
+orm中使用forginKey装饰器，建立表联系
+
+models中boardListCard中attachment comment字段是不存在的，使用hasMany装饰器建立联表
+
+```typescript
+@ForeignKey(() => User)
+@Column({
+type: DataType.INTEGER.UNSIGNED,
+	allowNull: false,
+	})
+userId: number;
+
+@HasMany(() => CardAttachment)
+attachments: CardAttachment[];
+
+@HasMany(() => Comment)
+comments: Comment[];
+
+```
+
+HasMany=>1对多的关系
+
+HasOne=>
+
+BelongTo，会查询对应的表然后 返回这个字段到模型中
+
+```
+ @BelongsTo(() => User)
+  user: User;
+```
+
+- inculde
+
+  在查询表时候除了where order 还能添加inculde 
+
+  ```tsx
+  inculde ：[
+  	{
+  		model: 你要查找的表模型，
   
-    
+  		attributes: ['你要的参数']
+  	}
+  ]
+  ```
+
+  
+
+## 列表卡片详情
+
+通过路由方式跳转到详情
+
+```vue
+  <!-- 'list/:listid(\\d+)/card/:cardid(\\d+)', -->
+  <!-- :to="{ name: 'user', params: { userId: 123 }}" -->
+  <router-link
+    class="list-card"
+    :to="{
+      name: 'Card',
+      params: { listid: data.boardListId, cardid: data.id }
+    }"
+  >
+```
 

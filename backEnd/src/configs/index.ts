@@ -4,9 +4,10 @@
  * @Author: Ellen
  * @Date: 2021-06-09 19:35:35
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-04 11:32:11
+ * @LastEditTime: 2021-07-08 22:54:03
  */
 import databaseConfig from "./database.json";
+import path from "path";
 
 //  dataBase Type
 interface IDataType {
@@ -30,6 +31,10 @@ const configs = {
     jwt: {
       privateKey: "snake",
     },
+    storage: {
+      dir: path.resolve(__dirname, "../attachments"),
+      path: "/public/attachments",
+    },
   },
   test: {
     server: {
@@ -40,6 +45,10 @@ const configs = {
     jwt: {
       privateKey: "snake",
     },
+    storage: {
+      dir: path.resolve(__dirname + "../attachments"),
+      path: "/public/attachments",
+    },
   },
   production: {
     server: {
@@ -49,6 +58,10 @@ const configs = {
     dataBase: databaseConfig.production as IDataType,
     jwt: {
       privateKey: "snake",
+    },
+    storage: {
+      dir: path.resolve(__dirname + "../attachments"),
+      path: "/public/attachments",
     },
   },
 };

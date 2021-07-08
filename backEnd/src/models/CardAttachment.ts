@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-30 21:47:25
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-04 18:57:15
+ * @LastEditTime: 2021-07-08 18:33:07
  */
 import {
   Model,
@@ -13,12 +13,12 @@ import {
   PrimaryKey,
   AutoIncrement,
   AllowNull,
-  Unique,
   ForeignKey,
   CreatedAt,
   UpdatedAt,
   DataType,
   Default,
+  BelongsTo,
 } from "sequelize-typescript";
 import { User } from "./User";
 import { BoardListCard } from "./BoardListCard";
@@ -59,6 +59,10 @@ export class CardAttachment extends Model<CardAttachment> {
     type: DataType.BOOLEAN,
   })
   isCover: string;
+
+  // 附件详情
+  @BelongsTo(() => Attachment)
+  detail: Attachment;
 
   @CreatedAt
   createdAt: Date;

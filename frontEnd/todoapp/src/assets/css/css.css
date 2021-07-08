@@ -32,7 +32,9 @@ u {
 u:hover {
   color: #000;
 }
-
+#nprogress .bar {
+  background: greenyellow !important;
+}
 /*icon*/
 @font-face {
   font-family: trellicons;
@@ -148,7 +150,7 @@ input {
 }
 .form-field-input:focus {
   background: #fff;
-  box-shadow: inset 0 0 0 2px #0079bf;
+  box-shadow: inset 0 0 3px 2px #0079bf;
 }
 .btn {
   position: relative;
@@ -533,6 +535,7 @@ board
 }
 
 .board {
+  display: flex;
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 8px;
@@ -559,10 +562,12 @@ board
   flex-direction: column;
   min-height: 0;
   max-height: 100%;
+  /* max-height: 80vh; */
   background-color: #ebecf0;
   box-shadow: 10px 10px 20px rgba(9, 30, 66, 0.25);
   border-radius: 3px;
   width: 250px;
+  overflow-y: auto;
 }
 .list-header {
   position: relative;
@@ -825,7 +830,7 @@ popup-window
   overflow-x: hidden;
   overflow-y: auto;
   background-color: rgba(0, 0, 0, 0.64);
-  z-index: 99999;
+  z-index: 99;
 }
 .window-overlay .popup {
   left: 50%;

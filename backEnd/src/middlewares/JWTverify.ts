@@ -1,5 +1,5 @@
 /*
- * @Des: 解密中间件
+ * @Des: 解密中间件， app.use。目的是让authorization可以作为中间件检查授权，获取id
  * @Version:
  * @Author: Ellen
  * @Date: 2021-07-01 20:47:31
