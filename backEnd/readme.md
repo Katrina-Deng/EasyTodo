@@ -50,6 +50,86 @@ Options:
 
 
 
-## 后端思路
+## 附件上存
 
-卡片路由
+- koa-body
+
+  [koabody](https://www.npmjs.com/package/koa-body)
+
+  解析body 二进制文件 的koa 库。注意查看上存文件方面的配置。
+
+  例如： Some options for formidable， Options
+
+  ```
+    app.use(
+      koaBody({
+        multipart: true,
+        formidable: {
+          keepExtensions: true,
+          uploadDir: configs.storage.dir,
+        },
+      })
+    );
+  ```
+
+- boardlistcard.ts
+
+  添加文件接口。注意了除了提交file文件时候，还要提交boardlistcardId用作cardAttachment作卡和附件的关联
+
+  ```ts
+  public async uploadAttachment(@Ctx() ctx: Context, @Body() body: any) {
+    	// 获取卡片的id  
+      let { boardListCardId } = body;
+      // 判断卡片存在？
+      let card = await getAndVaildBoardListCardID(
+        boardListCardId,
+        ctx.userInfo.id
+      );
+      if (!ctx.request.files || !ctx.request.files.attachment) {
+        throw boom.badData("缺少上存的文件");
+      }
+  	// ts 类型检测问题，要用json格式化一下不然会报错
+      let tempFile = JSON.stringify(ctx.request.files.attachment);
+      let file = JSON.parse(tempFile);
+  
+      let attachment = new Attachment();
+      attachment.userId = ctx.userInfo.id;
+      attachment.originName = file.name;
+      attachment.name = file.path.split("\\").pop() as string;
+      attachment.type = file.type;
+      attachment.size = file.size;
+      await attachment.save();
+  
+      let cardAttachment = new CardAttachment();
+      cardAttachment.userId = ctx.userInfo.id;
+      cardAttachment.boardListCardId = boardListCardId;
+      cardAttachment.attachmentId = attachment.id;
+      cardAttachment.isCover = false;
+  
+      await cardAttachment.save();
+      // 返给前端的格式 attachments[]对象数组里面的信息格式
+      return {
+        id: cardAttachment.id,
+        userId: ctx.userInfo.id,
+        boardListCardId: boardListCardId,
+        attachmentId: attachment.id,
+        isCover: false,
+        createdAt: cardAttachment.createdAt,
+        updatedAt: cardAttachment.updatedAt,
+        path: configs.storage.path + "/" + attachment.name,
+        details: {
+          id: attachment.id,
+          userId: ctx.userInfo.id,
+          originName: attachment.originName,
+          name: attachment.name,
+          type: attachment.type,
+          size: attachment.size,
+          createdAt: attachment.createdAt,
+          updatedAt: attachment.updatedAt,
+        },
+      };
+    }
+  ```
+
+  
+

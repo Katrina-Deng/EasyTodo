@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-07 22:52:14
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-08 22:00:32
+ * @LastEditTime: 2021-07-10 13:40:25
  */
 import {
   Controller,
@@ -25,6 +25,7 @@ import {
   postCardbody,
   getCardbody,
   putCardbody,
+  getAndVaildCardAttachment,
 } from "../vaildators/BoardListCardValid";
 import { getAndVaildBoardListID } from "../vaildators/BoardListValid";
 import { BoardListCard as BoardListCardModel } from "../models/BoardListCard";
@@ -32,6 +33,7 @@ import { CardAttachment } from "../models/CardAttachment";
 import { Attachment } from "../models/Attachment";
 import { Comment } from "../models/Comment";
 import configs from "../configs/index";
+import boom from "@hapi/boom";
 
 @Controller("/card")
 @Flow([authorization])
@@ -87,6 +89,7 @@ export class BoardListCard {
         },
       ],
     });
+
     // 返回数据重组
     let getCardsData = getCards.map((card: BoardListCardModel) => {
       //  封面路径
@@ -95,6 +98,7 @@ export class BoardListCard {
         // attachment 会有很多额外的属性
         // console.log("attachment", attachment);
         // toJSON() 去掉额外的属性 data 包含CardAttachment + details信息
+
         let data = attachment.toJSON() as CardAttachment & {
           path: string;
         };
@@ -171,6 +175,145 @@ export class BoardListCard {
   public async DeleteCardList(@Ctx() ctx: Context, @Params("id") id: number) {
     let delCard = await getAndVaildBoardListCardID(id, ctx.userInfo.id);
     delCard.destroy();
+    ctx.status = 204;
+    return;
+  }
+
+  /**
+   * @name: Ellen
+   * @test: 附件上存接口
+   * @msg: 上存文件的key值格式 /card/attachment
+   * @param {*}
+   * @return {*}
+   */
+
+  /*
+  file {
+  '': File {
+    _events: [Object: null prototype] {},
+    _eventsCount: 0,
+    _maxListeners: undefined,
+    size: 46676,
+    path: 'D:\\DemoProject\\trello\\backEnd\\src\\attachments\\upload_fe34bee8d6dc03af3553528a3c6aaf6d.jpeg',
+    name: '3.jpeg',
+    type: 'image/jpeg',
+    hash: null,
+    lastModifiedDate: 2021-07-09T10:13:55.746Z,
+*/
+
+  @Post("/attachment")
+  public async uploadAttachment(@Ctx() ctx: Context, @Body() body: any) {
+    let { boardListCardId } = body;
+    console.log("boardListCardId---", boardListCardId);
+
+    // 判断卡片存在？
+    let card = await getAndVaildBoardListCardID(
+      boardListCardId,
+      ctx.userInfo.id
+    );
+    if (!ctx.request.files || !ctx.request.files.attachment) {
+      throw boom.badData("缺少上存的文件");
+    }
+
+    let tempFile = JSON.stringify(ctx.request.files.attachment);
+    let file = JSON.parse(tempFile);
+
+    let attachment = new Attachment();
+    attachment.userId = ctx.userInfo.id;
+    attachment.originName = file.name;
+    attachment.name = file.path.split("\\").pop() as string;
+    attachment.type = file.type;
+    attachment.size = file.size;
+    await attachment.save();
+
+    let cardAttachment = new CardAttachment();
+    cardAttachment.userId = ctx.userInfo.id;
+    cardAttachment.boardListCardId = boardListCardId;
+    cardAttachment.attachmentId = attachment.id;
+    cardAttachment.isCover = false;
+
+    await cardAttachment.save();
+
+    return {
+      id: cardAttachment.id,
+      userId: ctx.userInfo.id,
+      boardListCardId: boardListCardId,
+      attachmentId: attachment.id,
+      isCover: false,
+      createdAt: cardAttachment.createdAt,
+      updatedAt: cardAttachment.updatedAt,
+      path: configs.storage.path + "/" + attachment.name,
+      detail: {
+        id: attachment.id,
+        userId: ctx.userInfo.id,
+        originName: attachment.originName,
+        name: attachment.name,
+        type: attachment.type,
+        size: attachment.size,
+        createdAt: attachment.createdAt,
+        updatedAt: attachment.updatedAt,
+      },
+    };
+  }
+
+  /**
+   * @name: Ellen
+   * @test: 删除附件
+   * @msg:
+   * @param {id: attachment id }
+   * @return {*}
+   */
+  @Delete("/attachment/:id(\\d+)")
+  public async deleteAttachment(@Ctx() ctx: Context, @Params("id") id: number) {
+    // attachment 验证
+    let attachment = await getAndVaildCardAttachment(id, ctx.userInfo.id);
+    await attachment.destroy();
+    ctx.status = 204;
+    return;
+  }
+
+  /**
+   * @name: Ellen
+   * @test: 设置封面
+   * @msg:
+   * @param {id: attachment id }
+   * @return {*}
+   */
+  @Put("/attachment/:id(\\d+)")
+  public async setCover(@Ctx() ctx: Context, @Params("id") id: number) {
+    // attachment 验证
+    let attachment = await getAndVaildCardAttachment(id, ctx.userInfo.id);
+    // 将其他封面设置fasle
+    await CardAttachment.update(
+      {
+        isCover: false,
+      },
+      {
+        where: {
+          boardListCardId: attachment.boardListCardId,
+        },
+      }
+    );
+    attachment.isCover = true;
+    await attachment.save();
+    ctx.status = 204;
+    return;
+  }
+
+  /**
+   * @name: Ellen
+   * @test: 移除附件
+   * @msg:
+   * @param {id: attachment id }
+   * @return {*}
+   */
+  @Delete("/attachment/:id(\\d+)")
+  public async delCover(@Ctx() ctx: Context, @Params("id") id: number) {
+    // attachment 验证
+    let attachment = await getAndVaildCardAttachment(id, ctx.userInfo.id);
+    // 将封面设置fasle
+    attachment.isCover = false;
+    await attachment.save();
     ctx.status = 204;
     return;
   }

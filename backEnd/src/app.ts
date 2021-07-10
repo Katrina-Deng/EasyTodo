@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-09 21:40:16
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-08 22:54:22
+ * @LastEditTime: 2021-07-09 18:09:09
  */
 import path from "path";
 import configs from "./configs";
@@ -71,7 +71,15 @@ import koaStaticCache from "koa-static-cache";
     throw Boom.notFound("router not found");
   });
 
-  app.use(koaBody());
+  app.use(
+    koaBody({
+      multipart: true,
+      formidable: {
+        keepExtensions: true,
+        uploadDir: configs.storage.dir,
+      },
+    })
+  );
   app.use(router.routes());
   app.listen(configs.server.port, () => {
     log("hello koa");

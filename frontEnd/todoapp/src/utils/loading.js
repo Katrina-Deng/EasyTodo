@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-04 13:49:51
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-04 13:50:22
+ * @LastEditTime: 2021-07-09 22:15:36
  */
 import { Loading } from 'element-ui' // 引入elm组件
 let loading
@@ -12,7 +12,7 @@ let loading
 function startLoading() {
   loading = Loading.service({
     lock: true,
-    text: '加载中......',
+    text: '努力加载中......',
     background: 'rgba(0, 0, 0, 0.7)'
   })
 }

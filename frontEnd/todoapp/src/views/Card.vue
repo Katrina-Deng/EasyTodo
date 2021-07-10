@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-01 22:27:03
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-08 23:06:14
+ * @LastEditTime: 2021-07-10 15:59:49
 -->
 
 <template>
@@ -68,7 +68,7 @@
             </div>
           </div>
           <!-- 附件内容 -->
-          <ul class="attachments">
+          <ul class="attachments" v-if="Array.isArray(card.attachments)">
             <li
               class="attachment"
               v-for="attachment in card.attachments"
@@ -86,25 +86,36 @@
                 >
                 <span class="attachment-thumbnail-descriptions">
                   <span class="datetime">{{
-                    attachment.detail.createdAt | DateFilter
+                    attachment.detail.createdAt | momentFilter
                   }}</span>
                   <span> - </span>
-                  <u>删除</u>
+                  <u @click="removeAttachment(attachment.id)">删除</u>
                 </span>
                 <span class="attachment-thumbnail-operation">
                   <i class="icon icon-card-cover"></i>
-                  <u>移除封面</u>
+                  <u v-if="attachment.isCover" @click="delCover(attachment.id)"
+                    >移除封面</u
+                  >
+                  <u v-else @click="setCover(attachment.id)">设为封面</u>
                 </span>
               </p>
             </li>
           </ul>
 
           <div>
-            <button class="btn btn-edit">添加附件</button>
+            <button class="btn btn-edit" @click="$refs.upload.click()">
+              添加附件
+            </button>
+            <input
+              type="file"
+              ref="upload"
+              style="display:none;"
+              @change="uploadFile"
+            />
           </div>
         </div>
 
-        <!--活动-->
+        <!--评论 -->
         <div class="window-module">
           <div class="title">
             <div class="title-icon">
@@ -114,128 +125,7 @@
               <h3>评论</h3>
             </div>
           </div>
-
-          <div class="comment-post">
-            <div class="avatar">
-              <span>Z</span>
-            </div>
-            <div class="comment-content-box editing">
-              <textarea
-                class="comment-content-input"
-                placeholder="添加评论……"
-              ></textarea>
-              <button class="btn btn-edit">保存</button>
-            </div>
-          </div>
-
-          <ul class="comments">
-            <li class="comment">
-              <div class="avatar">
-                <span>Z</span>
-              </div>
-              <div class="description">
-                <div class="header">
-                  <strong>zMouse</strong>
-                  <span> at </span>
-                  <i>2019年12月29日晚上11点04分</i>
-                </div>
-                <div class="content">
-                  非常不错！！
-                </div>
-              </div>
-            </li>
-            <li class="comment">
-              <div class="avatar">
-                <span>Z</span>
-              </div>
-              <div class="description">
-                <div class="header">
-                  <strong>zMouse</strong>
-                  <span> at </span>
-                  <i>2019年12月29日晚上11点04分</i>
-                </div>
-                <div class="content">
-                  非常不错！！
-                </div>
-              </div>
-            </li>
-            <li class="comment">
-              <div class="avatar">
-                <span>Z</span>
-              </div>
-              <div class="description">
-                <div class="header">
-                  <strong>zMouse</strong>
-                  <span> at </span>
-                  <i>2019年12月29日晚上11点04分</i>
-                </div>
-                <div class="content">
-                  非常不错！！
-                </div>
-              </div>
-            </li>
-            <li class="comment">
-              <div class="avatar">
-                <span>Z</span>
-              </div>
-              <div class="description">
-                <div class="header">
-                  <strong>zMouse</strong>
-                  <span> at </span>
-                  <i>2019年12月29日晚上11点04分</i>
-                </div>
-                <div class="content">
-                  非常不错！！
-                </div>
-              </div>
-            </li>
-            <li class="comment">
-              <div class="avatar">
-                <span>Z</span>
-              </div>
-              <div class="description">
-                <div class="header">
-                  <strong>zMouse</strong>
-                  <span> at </span>
-                  <i>2019年12月29日晚上11点04分</i>
-                </div>
-                <div class="content">
-                  非常不错！！
-                </div>
-              </div>
-            </li>
-            <li class="comment">
-              <div class="avatar">
-                <span>Z</span>
-              </div>
-              <div class="description">
-                <div class="header">
-                  <strong>zMouse</strong>
-                  <span> at </span>
-                  <i>2019年12月29日晚上11点04分</i>
-                </div>
-                <div class="content">
-                  非常不错！！
-                </div>
-              </div>
-            </li>
-          </ul>
-
-          <div class="comment-pagination">
-            <div class="pagination">
-              <span>首页</span>
-              <span>上一页</span>
-              <span>...</span>
-              <span>4</span>
-              <span>5</span>
-              <span class="current-page">6</span>
-              <span>7</span>
-              <span>8</span>
-              <span>...</span>
-              <span>下一页</span>
-              <span>尾页</span>
-            </div>
-          </div>
+          <t-comment :card-id="card.id"></t-comment>
         </div>
       </div>
     </div>
@@ -244,7 +134,9 @@
 
 <script>
 import { mapState } from 'vuex'
+import TComment from '../components/TComment.vue'
 export default {
+  components: { TComment },
   name: 'Card',
   computed: {
     ...mapState(['server']),
@@ -255,7 +147,6 @@ export default {
       return this.$store.getters['card/getCard'](this.$route.params.cardid)
     }
   },
-
   methods: {
     getCardName(e) {
       this.$refs.fieldinputName.innerHTML = e.target.value
@@ -283,6 +174,57 @@ export default {
           if (res.status === 204) {
             this.$message.success('更新成功')
           }
+        })
+    },
+    uploadFile() {
+      if (this.$refs.upload.files[0]) {
+        this.$store
+          .dispatch('card/uploadFile', {
+            boardListCardId: this.$route.params.cardid,
+            attachment: this.$refs.upload.files[0]
+          })
+          .then(res => {
+            res.status === 200
+              ? this.$message.success('上存成功')
+              : this.$message.error('上存失败')
+          })
+        this.$refs.upload.value = ''
+      }
+    },
+    removeAttachment(id) {
+      this.$store
+        .dispatch('card/removeAttachment', {
+          cardId: this.$route.params.cardid,
+          attachmentId: id
+        })
+        .then(res => {
+          res.status === 204
+            ? this.$message.success('删除成功')
+            : this.$message.error('删除失败')
+        })
+    },
+    setCover(id) {
+      this.$store
+        .dispatch('card/setCover', {
+          cardId: this.$route.params.cardid,
+          attachmentId: id
+        })
+        .then(res => {
+          res.status === 204
+            ? this.$message.success('设置成功')
+            : this.$message.error('设置失败')
+        })
+    },
+    delCover(id) {
+      this.$store
+        .dispatch('card/delCover', {
+          cardId: this.$route.params.cardid,
+          attachmentId: id
+        })
+        .then(res => {
+          res.status === 204
+            ? this.$message.success('移除成功')
+            : this.$message.error('移除失败')
         })
     }
   }

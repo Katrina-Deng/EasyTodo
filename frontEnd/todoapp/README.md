@@ -307,5 +307,218 @@ BelongTo，会查询对应的表然后 返回这个字段到模型中
   >
 ```
 
+## 时间处理
+
+### 自定义处理
+
+```js
+const DateFilter = function(val) {
+  const filterFarmat = n => {
+    return n < 10 ? `0${n}` : n
+  }
+
+  const time = new Date(val)
+
+  // eslint-disable-next-line no-unused-vars
+  const [day, month, year, hour, minutes, seconds] = [
+    filterFarmat(time.getDate()),
+    filterFarmat(time.getMonth() + 1),
+    filterFarmat(time.getFullYear()),
+    filterFarmat(time.getHours()),
+    filterFarmat(time.getMinutes()),
+    filterFarmat(time.getSeconds())
+  ]
+  return `${year}年${month}月${day}日${hour}时${minutes}分${seconds}秒`
+}
+export { DateFilter }
+```
+
+### moment.js
+
+[moment.js](http://momentjs.cn/docs/)
+
+```
+import moment from 'moment'
+
+moment.updateLocale('zh-cn', {
+  meridiem: function(hour, minute, isLowercase) {
+    if (hour < 9) {
+      return '早上'
+    } else if (hour < 11 && minute < 30) {
+      return '上午'
+    } else if (hour < 13 && minute < 30) {
+      return '中午'
+    } else if (hour < 18) {
+      return '下午'
+    } else {
+      return '晚上'
+    }
+  }
+})
+const momentFilter = function(val) {
+  return moment().format('LLL')
+}
+```
+
+全局注册过滤器
+
+```
+main.js
+
+import * as filters from './utils/filter'
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
+```
+
+
+
 ## 附件的上存
 
+- 删除附件注意的点
+  - 在数据中cardAttment 表记录这卡片和attachment 之间的关系，如果删除了attachement 中的记录会影响到cardAttment 中的记录要把cardAttment 中对应的删除的attachement .id的记录都删掉
+
+- 普通button
+
+  普通button不具备上存功能要，使用input type=file 标签实现上存。可以让input type=file隐藏，然后在button时候触发点击input type=file。之后绑定change事件获取文件(原生$refs.upload.files[0])。
+
+- 上存成功
+
+  上存成功后把file数组清空一下
+
+  ```js
+      uploadFile() {
+        if (this.$refs.upload.files[0]) {
+          this.$store
+            .dispatch('card/uploadFile', {
+              boardListCardId: this.$route.params.cardid,
+              attachment: this.$refs.upload.files[0]
+            })
+            .then(res => {
+              res.status === 200
+                ? this.$message.success('上存成功')
+                : this.$message.error('上存失败')
+            })
+          this.$refs.upload.value = ''
+        }
+      }
+  ```
+
+- 状态提交处
+
+  发起请求
+
+  action
+
+  ```js
+      async uploadFile({ commit }, data) {
+        // eslint-disable-next-line no-unused-vars
+        const res = await card.uploadFile(data)
+        // console.log('res', res.data)
+        commit('updateFileCard', res.data)
+        return res
+      }
+  ```
+
+  同时更新一下状态，做一下数据的重组，数据格式是这样的
+
+  ```json
+  [
+      {
+          "id": 2,
+          "userId": 1,
+          "boardListId": 2,
+          "name": "board-list-card-2",
+          "description": "board-list-card-content-2",
+          "order": 131072,
+          "createdAt": "2021-07-04T11:00:14.000Z",
+          "updatedAt": "2021-07-09T08:45:27.000Z",
+          "attachments": [
+              {
+                  "id": 13,
+                  "userId": 1,
+                  "boardListCardId": 2,
+                  "attachmentId": 13,
+                  "isCover": false,
+                  "createdAt": "2021-07-09T11:10:43.000Z",
+                  "updatedAt": "2021-07-09T11:10:43.000Z",
+                  "detail": {
+                      "id": 13,
+                      "userId": 1,
+                      "originName": "3.jpeg",
+                      "name": "upload_259155188203efef6c6f8513d63090f4.jpeg",
+                      "type": "image/jpeg",
+                      "size": 46676,
+                      "createdAt": "2021-07-09T11:10:43.000Z",
+                      "updatedAt": "2021-07-09T11:10:43.000Z"
+                  },
+                  "path": "/public/attachments/upload_259155188203efef6c6f8513d63090f4.jpeg"
+              }
+          ],
+          "coverPath": "",
+          "commentCount": 2
+      },
+      {
+          "id": 6,
+          "userId": 1,
+          "boardListId": 2,
+          "name": "board-list-card-6",
+          "description": "board-list-card-content-6",
+          "order": 393216,
+          "createdAt": "2021-07-04T11:00:14.000Z",
+          "updatedAt": "2021-07-04T11:00:14.000Z",
+          "attachments": [],
+          "coverPath": "",
+          "commentCount": 3
+      }
+  ]
+  ```
+
+  mutation，这样就可以做到实时更新页面而不用再次发起一次请求了。看需求把
+
+  ```
+      // 数据重组
+  updateFileCard(state, payload) {
+        state.cards = state.cards.map(card => {
+          if (card.id === parseFloat(payload.boardListCardId)) {
+            return { ...card, attachments: [...card.attachments, payload] }
+          } else {
+            return card
+          }
+        })
+  }
+  ```
+
+  
+
+- 设置封面，移除封面，移除附件
+
+  操作大同小异，比较又意思的一点是vuex的设置。对数组操作就比较繁琐一点。
+
+  ```
+     removeAttachment(state, payload) {
+        state.cards = state.cards.map(card => {
+          if (!card.attachments) {
+            card.attachments = []
+          }
+          if (card.id === parseFloat(payload.cardId)) {
+            return {
+              ...card,
+              coverPath:
+                card.attachments.find(
+                  attachment => attachment.id === parseInt(payload.attachmentId)
+                ).path === card.coverPath
+                  ? ''
+                  : card.coverPath,
+              attachments: card.attachments.filter(
+                attachment => attachment.id !== parseFloat(payload.attachmentId)
+              )
+            }
+          } else {
+            return card
+          }
+        })
+      },
+  ```
+
+  

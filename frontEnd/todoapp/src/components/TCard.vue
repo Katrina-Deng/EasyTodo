@@ -1,10 +1,10 @@
 <!--
- * @Des:卡片
+ * @Des:列表页的卡片
  * @Version:
  * @Author: Ellen
  * @Date: 2021-07-08 15:46:50
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-08 23:12:47
+ * @LastEditTime: 2021-07-10 15:44:56
 -->
 <template>
   <!-- 'list/:listid(\\d+)/card/:cardid(\\d+)', -->
@@ -33,7 +33,7 @@
         <span class="icon icon-comment"></span>
         <span class="text">{{ data.commentCount }}</span>
       </div>
-      <div class="badge" v-if="data.attachments.length">
+      <div class="badge" v-if="data.attachments && data.attachments.length">
         <span class="icon icon-attachment"></span>
         <span class="text">{{ data.attachments.length }}</span>
       </div>

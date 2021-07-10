@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-07-07 23:01:45
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-08 17:47:35
+ * @LastEditTime: 2021-07-10 15:37:22
  */
 import {
   IsNotEmpty,
@@ -14,6 +14,7 @@ import {
   IsNumberString,
 } from "class-validator";
 import { BoardListCard as BoardListCardModel } from "../models/BoardListCard";
+import { CardAttachment as CardAttachmentModel } from "../models/CardAttachment";
 import Boom from "@hapi/boom";
 
 export class postCardbody {
@@ -85,6 +86,28 @@ export async function getAndVaildBoardListCardID(
   }
   if (board.userId !== userid) {
     throw Boom.forbidden("卡片无法访问");
+  }
+
+  return board;
+}
+
+/**
+ * @name: Ellen
+ * @test: 附件是否属于改用户
+ * @msg:
+ * @param {*}
+ * @return {*}
+ */
+export async function getAndVaildCardAttachment(
+  id: number,
+  userid: number
+): Promise<CardAttachmentModel> {
+  let board = await CardAttachmentModel.findByPk(id);
+  if (!board) {
+    throw Boom.notFound("该附件不存在");
+  }
+  if (board.userId !== userid) {
+    throw Boom.forbidden("附件无法访问");
   }
 
   return board;

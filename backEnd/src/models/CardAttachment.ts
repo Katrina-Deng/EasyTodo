@@ -4,7 +4,7 @@
  * @Author: Ellen
  * @Date: 2021-06-30 21:47:25
  * @LastEditors: Ellen
- * @LastEditTime: 2021-07-08 18:33:07
+ * @LastEditTime: 2021-07-09 18:50:36
  */
 import {
   Model,
@@ -58,7 +58,7 @@ export class CardAttachment extends Model<CardAttachment> {
   @Column({
     type: DataType.BOOLEAN,
   })
-  isCover: string;
+  isCover: boolean;
 
   // 附件详情
   @BelongsTo(() => Attachment)
